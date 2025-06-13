@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Force Classification Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .quiz-container {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+    }
+    .category {
+      border: 2px dashed #ccc;
+      padding: 10px;
+      width: 250px;
+      min-height: 200px;
+      background-color: #f9f9f9;
+    }
+    .category h4 {
+      text-align: center;
+    }
+    .draggable {
+      padding: 8px;
+      margin: 5px;
+      background-color: #e0f7fa;
+      border: 1px solid #00796b;
+      cursor: grab;
+    }
+    #draggables {
+      margin-top: 20px;
+    }
+    #score {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Classify the Forces</h2>
+<p>Drag each force into the correct category and click "Check Answers" to see your score.</p>
+
+<div class="quiz-container">
+  <div class="category" id="contact" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h4>Contact Forces</h4>
+  </div>
+  <div class="category" id="noncontact" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h4>Non-Contact Forces</h4>
+  </div>
+</div>
+
+<div id="draggables">
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Friction">Friction</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Gravitational">Gravitational</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Tensile">Tensile</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Magnetic">Magnetic</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Compressive">Compressive</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Electrostatic">Electrostatic</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Normal">Normal</div>
+  <div class="draggable" draggable="true" ondragstart="drag(event)" id="AirResistance">Air Resistance</div>
+</div>
+
+<button onclick="checkAnswers()">Check Answers</button>
+<div id="score"></div>
+
+<script>
+  const correctAnswers = {
+    contact: ["Friction", "Tensile", "Compressive", "Normal", "AirResistance"],
+    noncontact: ["Gravitational", "Magnetic", "Electrostatic"]
+  };
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
+
+  function drop(ev) {
+    ev.preventDefault();
+    const data = ev.dataTransfer.getData("text");
+    const draggedElement = document.getElementById(data);
+    if (ev.target.classList.contains("category")) {
+      ev.target.appendChild(draggedElement);
+    }
+  }
+
+  function checkAnswers() {
+    let score = 0;
+    for (const category in correctAnswers) {
+      const container = document.getElementById(category);
+      const children = Array.from(container.children).map(el => el.id);
+      correctAnswers[category].forEach(force => {
+        if (children.includes(force)) {
+          score++;
+        }
+      });
+    }
+    document.getElementById("score").innerText = `Your score: ${score} / 8`;
+  }
+</script>
+
+</body>
+</html>
