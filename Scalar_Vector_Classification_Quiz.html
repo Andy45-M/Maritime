@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scalar and Vector Quantities Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    .drop-zone {
+      width: 45%;
+      min-height: 200px;
+      border: 2px dashed #ccc;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .drop-zone h3 {
+      text-align: center;
+    }
+    .draggable {
+      padding: 6px 10px;
+      margin: 5px;
+      background-color: #e0f7fa;
+      border: 1px solid #00796b;
+      border-radius: 4px;
+      cursor: move;
+      display: inline-block;
+      font-size: 0.95em;
+    }
+    #draggables {
+      text-align: center;
+      margin-top: 20px;
+    }
+    button {
+      margin: 20px 10px 0 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+    #score {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Classify the Following as Scalar or Vector Quantities</h2>
+
+<div id="draggables">
+  <div class="draggable" draggable="true" id="item1">Fuel Volume</div>
+  <div class="draggable" draggable="true" id="item2">Engine Thrust</div>
+  <div class="draggable" draggable="true" id="item3">Water Temperature</div>
+  <div class="draggable" draggable="true" id="item4">Ship Velocity</div>
+  <div class="draggable" draggable="true" id="item5">Time at Sea</div>
+  <div class="draggable" draggable="true" id="item6">Anchor Force</div>
+  <div class="draggable" draggable="true" id="item7">Displacement</div>
+  <div class="draggable" draggable="true" id="item8">Fuel Mass</div>
+  <div class="draggable" draggable="true" id="item9">Acceleration of Lifeboat</div>
+  <div class="draggable" draggable="true" id="item10">Engine Room Pressure</div>
+</div>
+
+<div class="container">
+  <div class="drop-zone" id="scalar">
+    <h3>Scalar Quantities</h3>
+  </div>
+  <div class="drop-zone" id="vector">
+    <h3>Vector Quantities</h3>
+  </div>
+</div>
+
+<div style="text-align: center;">
+  <button onclick="checkAnswers()">Check Answers</button>
+  <button onclick="resetQuiz()">Reset Quiz</button>
+</div>
+
+<div id="score"></div>
+
+<script>
+  const answers = {
+    item1: "scalar",
+    item2: "vector",
+    item3: "scalar",
+    item4: "vector",
+    item5: "scalar",
+    item6: "vector",
+    item7: "vector",
+    item8: "scalar",
+    item9: "vector",
+    item10: "scalar"
+  };
+
+  const draggables = document.querySelectorAll('.draggable');
+  const dropZones = document.querySelectorAll('.drop-zone');
+
+  draggables.forEach(item => {
+    item.addEventListener('dragstart', dragStart);
+  });
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', dragOver);
+    zone.addEventListener('drop', dropItem);
+  });
+
+  function dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.id);
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+  }
+
+  function dropItem(e) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const draggable = document.getElementById(id);
+    e.target.appendChild(draggable);
+  }
+
+  function checkAnswers() {
+    let score = 0;
+    for (const [id, type] of Object.entries(answers)) {
+      const item = document.getElementById(id);
+      if (item.parentElement.id === type) {
+        score++;
+      }
+    }
+    document.getElementById('score').textContent = `You scored ${score} out of 10`;
+  }
+
+  function resetQuiz() {
+    const draggablesContainer = document.getElementById('draggables');
+    for (const id in answers) {
+      const item = document.getElementById(id);
+      draggablesContainer.appendChild(item);
+    }
+    document.getElementById('score').textContent = '';
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>
