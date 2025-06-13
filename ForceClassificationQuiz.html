@@ -7,107 +7,140 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 2em;
     }
-    .quiz-container {
+    h2 {
+      text-align: center;
+    }
+    .container {
       display: flex;
-      gap: 40px;
-      margin-top: 20px;
+      justify-content: space-around;
+      margin-top: 2em;
     }
-    .category {
-      border: 2px dashed #ccc;
-      padding: 10px;
-      width: 250px;
+    .drop-zone {
+      width: 45%;
       min-height: 200px;
+      padding: 1em;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
       background-color: #f9f9f9;
     }
-    .category h4 {
+    .drop-zone h3 {
       text-align: center;
     }
     .draggable {
-      padding: 8px;
-      margin: 5px;
-      background-color: #e0f7fa;
-      border: 1px solid #00796b;
+      display: inline-block;
+      padding: 0.5em 1em;
+      margin: 0.5em;
+      background-color: #e0e0e0;
+      border: 1px solid #999;
+      border-radius: 4px;
       cursor: grab;
+      font-size: 0.9em;
     }
     #draggables {
-      margin-top: 20px;
-    }
-    #score {
-      margin-top: 20px;
-      font-weight: bold;
+      text-align: center;
+      margin-top: 1em;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
+      display: block;
+      margin: 2em auto 1em;
+      padding: 0.5em 1.5em;
       font-size: 1em;
+    }
+    #score {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 1em;
     }
   </style>
 </head>
 <body>
 
-<h2>Classify the Forces</h2>
-<p>Drag each force into the correct category and click "Check Answers" to see your score.</p>
-
-<div class="quiz-container">
-  <div class="category" id="contact" ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h4>Contact Forces</h4>
-  </div>
-  <div class="category" id="noncontact" ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h4>Non-Contact Forces</h4>
-  </div>
-</div>
+<h2>Force Classification Quiz</h2>
+<p style="text-align:center;">Drag each force into the correct category: Contact or Non-Contact</p>
 
 <div id="draggables">
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Friction">Friction</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Gravitational">Gravitational</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Tensile">Tensile</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Magnetic">Magnetic</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Compressive">Compressive</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Electrostatic">Electrostatic</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="Normal">Normal</div>
-  <div class="draggable" draggable="true" ondragstart="drag(event)" id="AirResistance">Air Resistance</div>
+  <div class="draggable" draggable="true" id="Friction">Friction</div>
+  <div class="draggable" draggable="true" id="Magnetic">Magnetic</div>
+  <div class="draggable" draggable="true" id="Electrostatic">Electrostatic</div>
+  <div class="draggable" draggable="true" id="Tension">Tension</div>
+  <div class="draggable" draggable="true" id="Normal">Normal</div>
+  <div class="draggable" draggable="true" id="AirResistance">Air Resistance</div>
+  <div class="draggable" draggable="true" id="Gravitational">Gravitational</div>
+  <div class="draggable" draggable="true" id="Applied">Applied</div>
+</div>
+
+<div class="container">
+  <div class="drop-zone" id="Contact">
+    <h3>Contact Forces</h3>
+  </div>
+  <div class="drop-zone" id="NonContact">
+    <h3>Non-Contact Forces</h3>
+  </div>
 </div>
 
 <button onclick="checkAnswers()">Check Answers</button>
+<button onclick="resetQuiz()">Reset Quiz</button>
+
 <div id="score"></div>
 
 <script>
+  const draggables = document.querySelectorAll('.draggable');
+  const dropZones = document.querySelectorAll('.drop-zone');
   const correctAnswers = {
-    contact: ["Friction", "Tensile", "Compressive", "Normal", "AirResistance"],
-    noncontact: ["Gravitational", "Magnetic", "Electrostatic"]
+    Contact: ['Friction', 'Tension', 'Normal', 'AirResistance', 'Applied'],
+    NonContact: ['Magnetic', 'Electrostatic', 'Gravitational']
   };
 
-  function allowDrop(ev) {
-    ev.preventDefault();
-  }
+  draggables.forEach(item => {
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', e.target.id);
+    });
+  });
 
-  function drag(ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
-  }
-
-  function drop(ev) {
-    ev.preventDefault();
-    const data = ev.dataTransfer.getData("text");
-    const draggedElement = document.getElementById(data);
-    if (ev.target.classList.contains("category")) {
-      ev.target.appendChild(draggedElement);
-    }
-  }
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const dragged = document.getElementById(id);
+      if (dragged) {
+        zone.appendChild(dragged);
+      }
+    });
+  });
 
   function checkAnswers() {
     let score = 0;
-    for (const category in correctAnswers) {
-      const container = document.getElementById(category);
-      const children = Array.from(container.children).map(el => el.id);
-      correctAnswers[category].forEach(force => {
-        if (children.includes(force)) {
+    for (const zone in correctAnswers) {
+      const zoneEl = document.getElementById(zone);
+      const children = Array.from(zoneEl.children).map(el => el.id);
+      correctAnswers[zone].forEach(answer => {
+        if (children.includes(answer)) {
           score++;
         }
       });
     }
-    document.getElementById("score").innerText = `Your score: ${score} / 8`;
+    document.getElementById('score').textContent = `Your score: ${score} / 8`;
+  }
+
+  function resetQuiz() {
+    const draggablesContainer = document.getElementById('draggables');
+    for (const zone in correctAnswers) {
+      const zoneEl = document.getElementById(zone);
+      correctAnswers[zone].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          draggablesContainer.appendChild(el);
+        }
+      });
+    }
+    document.getElementById('score').textContent = '';
+    window.scrollTo(0, 0);
   }
 </script>
 
